@@ -35,4 +35,5 @@
 # Directories
 src/*/obj
 src/*/bin
+src/\.*
 

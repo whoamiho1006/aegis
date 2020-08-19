@@ -192,6 +192,8 @@ namespace Aegis.Blockchains
         /// <returns></returns>
         public bool Verify()
         {
+            bool RetVal = false;
+
             lock(m_BlockState)
             {
                 Block Latest = this.Latest;
@@ -202,7 +204,8 @@ namespace Aegis.Blockchains
                 BlockState State = LoadState();
                 if (Latest.Verify(true))
                 {
-                    while(true)
+                    RetVal = true;
+                    while (RetVal)
                     {
                         if (State.Low != 0 || State.High != 0)
                         {
@@ -220,15 +223,17 @@ namespace Aegis.Blockchains
 
                         else break;
 
-                        if (!Latest.Verify(false))
-                            return false;
+                        if (!(Latest is null) &&
+                            ! Latest.Verify(false))
+                        {
+                            RetVal = false;
+                        }
                     }
-
-                    return true;
                 }
             }
 
-            return false;
+            GC.WaitForPendingFinalizers();
+            return RetVal;
         }
 
         /// <summary>

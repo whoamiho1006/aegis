@@ -30,6 +30,11 @@ namespace Aegis.Utilities
         }
 
         /// <summary>
+        /// Determines whether dispatcher is empty or not.
+        /// </summary>
+        public bool IsEmpty => !m_ARE.WaitOne(0);
+
+        /// <summary>
         /// Push an Item to internal concurrent queue.
         /// </summary>
         /// <param name="Item"></param>

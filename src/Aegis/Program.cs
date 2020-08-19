@@ -3,6 +3,7 @@ using Aegis.Blockchains;
 using System;
 using System.IO;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Aegis
 {
@@ -17,10 +18,11 @@ namespace Aegis
             else Pvt = SECP256K1.Instance.NewPrivateKey();
 
             Blockchain Bc = new Blockchain(new DirectoryInfo("."), Pvt);
-            
-            
 
-            while(true)
+            if (!Bc.Verify())
+                Debugger.Break();
+
+            while (true)
             {
                 Block NewBlock = null;
 
