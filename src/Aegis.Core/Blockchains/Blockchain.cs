@@ -73,7 +73,7 @@ namespace Aegis.Blockchains
             catch { SaveState(ref State, false); }
 
             // Load latest block.
-            if (State.Low != 0 && State.High != 0)
+            if (State.Low != 0 || State.High != 0)
             {
                 if (State.Low > 0)
                     --State.Low;
@@ -183,6 +183,52 @@ namespace Aegis.Blockchains
             }
 
             return BlockId;
+        }
+
+        /// <summary>
+        /// Verify block-chain status.
+        /// Last block should have Target.
+        /// </summary>
+        /// <returns></returns>
+        public bool Verify()
+        {
+            lock(m_BlockState)
+            {
+                Block Latest = this.Latest;
+
+                if (Latest is null)
+                    throw new InvalidDataException(nameof(Latest));
+
+                BlockState State = LoadState();
+                if (Latest.Verify(true))
+                {
+                    while(true)
+                    {
+                        if (State.Low != 0 || State.High != 0)
+                        {
+                            if (State.Low > 0)
+                                --State.Low;
+
+                            else
+                            {
+                                --State.High;
+                                State.Low = uint.MaxValue - 1;
+                            }
+
+                            Latest = _LoadBlock(ref State) ?? this.Genesis;
+                        }
+
+                        else break;
+
+                        if (!Latest.Verify(false))
+                            return false;
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
