@@ -8,7 +8,10 @@ using System.Text;
 
 namespace Aegis.Endpoints.Common
 {
-    public interface IHeader { }
+    public interface IHeader
+    {
+        HeaderAttribute Attribute { get; }
+    }
 
 
     /// <summary>
@@ -19,6 +22,19 @@ namespace Aegis.Endpoints.Common
         : ObjectPool<SelfType>, ILifeCycled, IHeader
         where SelfType : Header<SelfType>, new()
     {
+        private HeaderAttribute m_Attribute;
+
+        /// <summary>
+        /// Header.
+        /// </summary>
+        public Header() => m_Attribute = GetType()
+            .GetCustomAttribute<HeaderAttribute>();
+
+        /// <summary>
+        /// Header Attribute.
+        /// </summary>
+        public HeaderAttribute Attribute => m_Attribute;
+
         /// <summary>
         /// Parse String into Header.
         /// </summary>

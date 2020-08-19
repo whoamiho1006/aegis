@@ -73,7 +73,6 @@ namespace Aegis.Endpoints.HTTP
                     = new List<IFilter<IConnection>>(m_Filters);
 
                 var Connection = new Connection(Context);
-
                 for(int i = 0; i < Filters.Count; i++)
                 {
                     var Result = Filters[i].Filter(Connection);
@@ -81,7 +80,7 @@ namespace Aegis.Endpoints.HTTP
                     switch (Result)
                     {
                         case EFilterResult.Reject:
-                            Filters.Clear();
+                            Connection.Disconnect();
                             Connection = null;
                             break;
 
@@ -92,9 +91,10 @@ namespace Aegis.Endpoints.HTTP
                 }
 
                 Filters.Clear();
+
                 if (!(Connection is null))
                 {
-
+                    
                 }
             }
 

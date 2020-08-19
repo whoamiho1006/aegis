@@ -23,6 +23,11 @@ namespace Aegis.Endpoints.HTTP
         }
 
         /// <summary>
+        /// HTTP Context of .NET Core.
+        /// </summary>
+        internal HttpListenerContext HLC => m_Context;
+
+        /// <summary>
         /// Determines this connection is available or not.
         /// </summary>
         public bool IsAlive => m_Availability;
