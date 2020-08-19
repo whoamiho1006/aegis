@@ -16,3 +16,6 @@ And of course AEGIS itself is open source with a [public repository](https://git
 
 AEGIS requires [.NET Core](https://dotnet.microsoft.com/download/dotnet-core/3.1) v3.1 (or above) to run.
 (Not yet available currently, Wait more time.)
+
+### Documentation
+Refer https://whoamiho1006.gitbook.io/aegis/ instead of GitHub's Wiki.
