@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aegis", "Aegis\Aegis.csproj", "{590E5DAA-DEBC-4838-B5F0-458FD83D0AC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aegis.Core", "Aegis.Core\Aegis.Core.csproj", "{8F42B3F8-F08E-4CEE-A886-5709FBDDD6A9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{590E5DAA-DEBC-4838-B5F0-458FD83D0AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{590E5DAA-DEBC-4838-B5F0-458FD83D0AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{590E5DAA-DEBC-4838-B5F0-458FD83D0AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{590E5DAA-DEBC-4838-B5F0-458FD83D0AC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F42B3F8-F08E-4CEE-A886-5709FBDDD6A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F42B3F8-F08E-4CEE-A886-5709FBDDD6A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F42B3F8-F08E-4CEE-A886-5709FBDDD6A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F42B3F8-F08E-4CEE-A886-5709FBDDD6A9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {12E92FE7-F127-49FC-85B2-A99ED40CEC50}
+	EndGlobalSection
+EndGlobal
