@@ -32,6 +32,7 @@ namespace Aegis
                 Console.WriteLine("{0} - {1}, {2}", BlockId, 
                     Convert.ToBase64String(NewBlock.Linkage.Hash),
                     Convert.ToBase64String(NewBlock.Verification.Signature));
+
                 Thread.Sleep(100);
             }
         }

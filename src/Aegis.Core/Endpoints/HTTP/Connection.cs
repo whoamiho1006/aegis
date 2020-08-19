@@ -38,6 +38,11 @@ namespace Aegis.Endpoints.HTTP
         public IPEndPoint RemoteAddress { get; }
 
         /// <summary>
+        /// Commit Response to this connection.
+        /// </summary>
+        public void Commit() => Disconnect(false);
+
+        /// <summary>
         /// Disconnect this connection.
         /// </summary>
         public void Disconnect(bool Graceful = true)

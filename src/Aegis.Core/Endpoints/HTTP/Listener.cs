@@ -92,10 +92,13 @@ namespace Aegis.Endpoints.HTTP
 
                 Filters.Clear();
 
-                if (!(Connection is null))
+                /* Drop request if it cause exception. */
+                try
                 {
-                    
+                    if (!(Connection is null))
+                        return new Request(Connection);
                 }
+                catch { }
             }
 
             return null;

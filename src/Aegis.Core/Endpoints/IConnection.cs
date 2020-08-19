@@ -15,7 +15,12 @@ namespace Aegis.Endpoints
         IPEndPoint RemoteAddress { get; }
 
         /// <summary>
-        /// Disconnect
+        /// Commit response to this connection.
+        /// </summary>
+        void Commit();
+
+        /// <summary>
+        /// Disconnect and finalize latest response.
         /// </summary>
         void Disconnect(bool Graceful = true);
     }
