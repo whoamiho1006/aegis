@@ -182,10 +182,16 @@ namespace Aegis.Workers.Tasks
             var Future = (state as Future);
 
             try { Future.OnExecution(); }
-            catch (Exception e) { 
-                Future.m_Exception = e; 
+            catch (Exception e)
+            {
+                Future.m_Exception = e;
             }
 
+            ActChaining(Future);
+        }
+
+        internal static void ActChaining(Future Future)
+        {
             Future.m_Waiter.Set();
             lock (Future)
             {
@@ -195,7 +201,7 @@ namespace Aegis.Workers.Tasks
                     Future.m_Futures.Dequeue().Schedule();
             }
         }
-        
+
         /// <summary>
         /// Callback for executing the functor.
         /// </summary>

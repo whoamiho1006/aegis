@@ -74,6 +74,8 @@ namespace Aegis.Workers.Tasks
                 {
                     Future.m_Result = Result;
                     Future.m_Completion = 1;
+
+                    Tasks.Future.ActChaining(Future);
                 }
             }
         }
@@ -90,6 +92,8 @@ namespace Aegis.Workers.Tasks
                 {
                     Future.m_Exception = e;
                     Future.m_Completion = 1;
+
+                    Tasks.Future.ActChaining(Future);
                 }
             }
         }
