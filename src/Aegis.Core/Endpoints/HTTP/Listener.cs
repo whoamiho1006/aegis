@@ -1,4 +1,5 @@
-﻿using Aegis.Utilities;
+﻿using Aegis.Endpoints.WebSocket;
+using Aegis.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace Aegis.Endpoints.HTTP
         private HttpListener m_Listener;
         private ConcurrentBag<IFilter<IConnection>> m_Filters;
         private Dispatcher<HttpListenerContext> m_Dispatcher;
+        private IWebSocketExtension m_WebSocketExtension;
 
         /// <summary>
         /// Initialize a HTTP Listener
@@ -33,6 +35,13 @@ namespace Aegis.Endpoints.HTTP
             m_Listener.Start();
             m_Listener.BeginGetContext(OnCompletion, this);
         }
+
+        /// <summary>
+        /// Set websocket extension if this used for websocket or 
+        /// extending listener configured.
+        /// </summary>
+        /// <param name="Extension"></param>
+        internal void SetWebSocketExtension(IWebSocketExtension Extension) => m_WebSocketExtension = Extension;
 
         /// <summary>
         /// Completion Event of Listener.
@@ -69,6 +78,9 @@ namespace Aegis.Endpoints.HTTP
 
             if (m_Dispatcher.Dispatch(Timeout, out Context))
             {
+                if (Context.Request.IsWebSocketRequest)
+                    return HandleWebSocket(Context);
+
                 List<IFilter<IConnection>> Filters 
                     = new List<IFilter<IConnection>>(m_Filters);
 
@@ -80,7 +92,7 @@ namespace Aegis.Endpoints.HTTP
                     switch (Result)
                     {
                         case EFilterResult.Reject:
-                            Connection.Disconnect();
+                            Connection.Disconnect(true);
                             Connection = null;
                             break;
 
@@ -98,6 +110,40 @@ namespace Aegis.Endpoints.HTTP
                     if (!(Connection is null))
                         return new Request(Connection);
                 }
+                catch { }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Handle request as WebSocket if incoming context is for that.
+        /// </summary>
+        /// <param name="Context"></param>
+        /// <returns></returns>
+        private IRequest HandleWebSocket(HttpListenerContext Context)
+        {
+            if (m_WebSocketExtension is null)
+            {
+                try
+                {
+                    Context.Response.StatusCode = 503;
+                    Context.Response.StatusDescription = "Not Implemented";
+                    Context.Response.Close();
+                }
+
+                catch { }
+            }
+
+            else if (!m_WebSocketExtension.Upgrade(Context))
+            {
+                try
+                {
+                    Context.Response.StatusCode = 400;
+                    Context.Response.StatusDescription = "Bad Request";
+                    Context.Response.Close();
+                }
+
                 catch { }
             }
 

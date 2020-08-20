@@ -1,22 +1,24 @@
 ﻿using Aegis.Endpoints.Common;
 
-namespace Aegis.Endpoints
+namespace Aegis.Endpoints.HTTP
 {
-    public interface IResponse
+    internal class Response : IResponse
     {
         /// <summary>
         /// Status code for response.
         /// </summary>
-        EStatusCode StatusCode { get; set; }
+        public EStatusCode StatusCode { get; set; }
 
         /// <summary>
         /// Header collection for response.
         /// </summary>
-        HeaderCollection Headers { get; }
+        public HeaderCollection Headers { get; } = new HeaderCollection();
 
         /// <summary>
         /// Output content for response.
         /// </summary>
-        ResponseContent Output { get; set; }
+        public ResponseContent Output { get; set; }
     }
+
+    
 }

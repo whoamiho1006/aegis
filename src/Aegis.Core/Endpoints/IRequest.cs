@@ -47,12 +47,4 @@ namespace Aegis.Endpoints
         /// </summary>
         Stream Contents { get; }
     }
-
-    public enum EMethod
-    {
-        GET, POST,
-        PUT, PATCH,
-        OPTIONS,
-        DELETE
-    }
 }
