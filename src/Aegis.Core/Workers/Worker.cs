@@ -24,6 +24,8 @@ namespace Aegis.Workers
         private bool m_KeepRunning;
         private int m_Disposing;
 
+        private (string Name, object Data)[] m_Inheritances;
+
         /// <summary>
         /// Initialize a new predictable worker.
         /// </summary>
@@ -35,6 +37,8 @@ namespace Aegis.Workers
             m_KeepRunning = true;
 
             m_Dispatcher = new Dispatcher<WorkItem>();
+            m_Inheritances = TlsVariables.Export();
+
             Thread = new Thread(OnThreadMain)
             {
                 IsBackground = true, Priority = Priority,
@@ -43,6 +47,36 @@ namespace Aegis.Workers
 
             Thread.Start();
         }
+
+        /// <summary>
+        /// Initialize a new predictable worker.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <param name="Priority"></param>
+        public Worker(IWorker Parent, string Name = null, ThreadPriority Priority = ThreadPriority.Normal)
+        {
+            m_Disposing = 0;
+            m_KeepRunning = true;
+
+            m_Dispatcher = new Dispatcher<WorkItem>();
+            m_Inheritances = TlsVariables.Export();
+
+            this.Parent = Parent;
+
+            Thread = new Thread(OnThreadMain)
+            {
+                IsBackground = true,
+                Priority = Priority,
+                Name = Name ?? "A-Worker #" + Interlocked.Increment(ref m_Number)
+            };
+
+            Thread.Start();
+        }
+
+        /// <summary>
+        /// Parent worker instance.
+        /// </summary>
+        public IWorker Parent { get; }
 
         /// <summary>
         /// Thread Instance for this worker.
@@ -81,6 +115,10 @@ namespace Aegis.Workers
         private void OnThreadMain()
         {
             m_TLS.Value = this;
+
+            TlsVariables
+                .Import(m_Inheritances);
+            m_Inheritances = null;
 
             while (m_KeepRunning)
             {

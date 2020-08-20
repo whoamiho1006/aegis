@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Aegis.Workers
 {
-    public partial class Worker
+    public partial class Worker : IWorker
     {
         /// <summary>
         /// Work Item.
