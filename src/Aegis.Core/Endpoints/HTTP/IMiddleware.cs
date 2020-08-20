@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Aegis.Workers.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,6 @@ namespace Aegis.Endpoints.HTTP
         /// <param name="Context"></param>
         /// <param name="Next"></param>
         /// <returns></returns>
-        Task<Context> Handle(Context Context, IMiddleware Next);
+        Future<Context> Handle(Context Context);
     }
 }

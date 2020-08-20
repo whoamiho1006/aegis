@@ -32,6 +32,13 @@ namespace Aegis.Endpoints.HTTP
         /// </summary>
         public IResponse Response { get; }
 
+#if DEBUG
+        /// <summary>
+        /// Middleware collection which affected on this context.
+        /// </summary>
+        internal List<IMiddleware> Middlewares { get; } = new List<IMiddleware>();
+#endif 
+
         /// <summary>
         /// Get component by its exact type.
         /// </summary>

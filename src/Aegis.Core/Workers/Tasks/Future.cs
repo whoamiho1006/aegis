@@ -243,6 +243,16 @@ namespace Aegis.Workers.Tasks
         }
 
         /// <summary>
+        /// Schedule this future task to be ran.
+        /// </summary>
+        /// <returns></returns>
+        public new Future<TResult> Schedule()
+        {
+            base.Schedule();
+            return this;
+        }
+
+        /// <summary>
         /// If this future completed then, schedule given future.
         /// (Pararel chaining)
         /// </summary>

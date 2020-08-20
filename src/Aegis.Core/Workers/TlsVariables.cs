@@ -30,7 +30,13 @@ namespace Aegis.Workers
         /// <param name="Name"></param>
         /// <returns></returns>
         public static TObject Get<TObject>(string Name)
-            where TObject: class => m_Variables.Value[Name] as TObject;
+            where TObject : class
+        {
+            try { return m_Variables.Value[Name] as TObject; }
+            catch { }
+
+            return default;
+        }
 
         /// <summary>
         /// Export TLS Variables of this thread.
