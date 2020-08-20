@@ -12,15 +12,41 @@ namespace Aegis.Workers.Tasks
     /// </summary>
     public class Future
     {
-        private IWorker m_Worker;
+        internal IWorker m_Worker;
         private Action m_Functor;
 
-        private Queue<Future> m_Futures;
-        private int m_Scheduled = 0;
-        private int m_Completion = 0;
+        internal Queue<Future> m_Futures;
+        internal int m_Scheduled = 0;
+        internal int m_Completion = 0;
 
-        private ManualResetEventSlim m_Waiter;
-        private Exception m_Exception;
+        internal ManualResetEventSlim m_Waiter;
+        internal Exception m_Exception;
+
+        /// <summary>
+        /// Already Completed Future.
+        /// </summary>
+        public static Future Completed { get; } = new Future();
+
+        /// <summary>
+        /// Already Faulted Future.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static Future<TResult> MakeCompleted<TResult>(TResult e) => new Future<TResult>(e);
+
+        /// <summary>
+        /// Already Faulted Future.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static Future MakeFaulted(Exception e) => new Future() { m_Exception = e };
+
+        /// <summary>
+        /// Already Faulted Future.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static Future<TResult> MakeFaulted<TResult>(Exception e) => new Future<TResult>() { m_Exception = e };
 
         /// <summary>
         /// Initialize a future with functor.
@@ -40,16 +66,19 @@ namespace Aegis.Workers.Tasks
         /// <summary>
         /// Initialize an already completed future.
         /// </summary>
-        /// <param name="Dummy"></param>
-        protected Future(bool Dummy)
+        /// <param name="RequiresWorker"></param>
+        internal Future(bool Scheduled = true, bool Completed = true)
         {
-            if ((m_Worker = TlsVariables.Get<IWorker>("worker")) is null)
+            if (!Scheduled && (m_Worker = TlsVariables.Get<IWorker>("worker")) is null)
                 throw new InvalidOperationException("Future class requires valid worker instance!");
 
-            m_Scheduled = 1;
-            m_Completion = 1;
+            if (!Scheduled || !Completed)
+                m_Futures = new Queue<Future>();
 
-            m_Waiter = new ManualResetEventSlim(true);
+            m_Scheduled = Scheduled ? 1 : 0;
+            m_Completion = Completed ? 1 : 0;
+
+            m_Waiter = new ManualResetEventSlim(Completed);
         }
 
         /// <summary>
@@ -76,7 +105,7 @@ namespace Aegis.Workers.Tasks
                 throw new ArgumentNullException(nameof(Future));
 
             bool Immediate = false;
-            lock(m_Futures)
+            lock(this)
             {
                 if (m_Completion <= 0)
                     m_Futures.Enqueue(Future);
@@ -158,7 +187,7 @@ namespace Aegis.Workers.Tasks
             }
 
             Future.m_Waiter.Set();
-            lock (Future.m_Futures)
+            lock (Future)
             {
                 ++Future.m_Completion;
 
@@ -176,7 +205,7 @@ namespace Aegis.Workers.Tasks
     public class Future<TResult> : Future
     {
         private Func<TResult> m_Functor;
-        private TResult m_Result;
+        internal TResult m_Result;
 
         /// <summary>
         /// Initialize a future with functor.
@@ -193,9 +222,18 @@ namespace Aegis.Workers.Tasks
         /// </summary>
         /// <param name="Dummy"></param>
         public Future(TResult Result)
-            : base(true)
+            : base()
         {
             m_Result = Result;
+        }
+
+        /// <summary>
+        /// Initialize an already completed future.
+        /// </summary>
+        /// <param name="RequiresWorker"></param>
+        internal Future(bool Scheduled = true, bool Completed = true) 
+            : base(Scheduled, Completed)
+        {
         }
 
         /// <summary>
