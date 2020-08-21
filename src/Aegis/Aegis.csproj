@@ -13,4 +13,13 @@
     <ProjectReference Include="..\Aegis.Core\Aegis.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Assets\scripts\jquery-3.5.1.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\scripts\registration.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

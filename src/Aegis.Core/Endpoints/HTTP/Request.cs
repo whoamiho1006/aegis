@@ -10,7 +10,6 @@ namespace Aegis.Endpoints.HTTP
     
     internal class Request : IRequest
     {
-
         /// <summary>
         /// Encapsulate Connection into Request.
         /// </summary>
@@ -20,7 +19,8 @@ namespace Aegis.Endpoints.HTTP
             var OReq = ((this.Connection = Connection) as Connection).HLC.Request;
 
             int Question = (Path = OReq.Url.PathAndQuery).IndexOf('?');
-            string[] QueryKVs = (QueryString = Path.Substring(Question + 1)).Split('&');
+            string[] QueryKVs = Question >= 0 ?
+                (QueryString = Path.Substring(Question + 1)).Split('&') : null;
 
             Headers.Import(OReq);
 
@@ -30,13 +30,18 @@ namespace Aegis.Endpoints.HTTP
             if (Headers.Find("User-Agent") is null)
                 throw new InvalidDataException("User-Agent");
 
+            Question = Question < 0 ? Path.Length : Question;
             Path = Uri.UnescapeDataString(Path.Substring(0, Question).Trim());
-            foreach(string EachKV in QueryKVs)
-            {
-                int Equal = EachKV.IndexOf('=');
-                string Key = EachKV.Substring(0, Equal);
 
-                Queries[Key] = EachKV.Substring(Equal + 1);
+            if (QueryKVs != null)
+            {
+                foreach (string EachKV in QueryKVs)
+                {
+                    int Equal = EachKV.IndexOf('=');
+                    string Key = EachKV.Substring(0, Equal);
+
+                    Queries[Key] = EachKV.Substring(Equal + 1);
+                }
             }
 
             Host = OReq.UserHostName;

@@ -1,4 +1,5 @@
-﻿using Aegis.Utilities;
+﻿using Aegis.Endpoints.Common;
+using Aegis.Utilities;
 using Aegis.Workers;
 using Aegis.Workers.Tasks;
 using System;
@@ -178,8 +179,9 @@ namespace Aegis.Endpoints.HTTP
                  * Handle a context and then,
                  * commit response to client.
                  */
-                Handle(Context)
-                    .Then(new Future(() => Commit(Context)))
+                Future<Context> Future = Handle(Context);
+
+                Future.And(new Future(() => Commit(Context)))
                     .Schedule();
             }
         }
@@ -236,6 +238,15 @@ namespace Aegis.Endpoints.HTTP
             }
 
             Context.Request.Connection.Commit();
+
+            foreach (var Each in Context.Response.Headers)
+                Header.DeInstantiate(Each);
+
+            foreach (var Each in Context.Request.Headers)
+                Header.DeInstantiate(Each);
+
+            Context.Request.Headers.Clear();
+            Context.Response.Headers.Clear();
         }
 
         /// <summary>
@@ -261,16 +272,23 @@ namespace Aegis.Endpoints.HTTP
                 return Context;
 
             else if (TargetObject is IHandler)
-                return (TargetObject as IHandler).Handle(Context);
+            {
+                Context.Response.StatusCode = EStatusCode.Okay;
+
+                try { return (TargetObject as IHandler).Handle(Context); }
+                catch
+                {
+                    Context.Response.StatusCode = EStatusCode.InternalServerError;
+                    Context.Response.Output = new ResponseContent { };
+                }
+            }
 
             /* *
              * Input path is mapped for really existed file.
              * */
             else if (TargetObject is FileInfo)
             {
-                FileInfo File = TargetObject as FileInfo;
-
-                try { SetContentAsFile(Context, File); }
+                try { SetContentAsFile(Context, TargetObject as FileInfo); }
                 catch
                 {
                     Context.Response.StatusCode = EStatusCode.InternalServerError;
@@ -284,7 +302,7 @@ namespace Aegis.Endpoints.HTTP
             else if (TargetObject is DirectoryInfo)
             {
                 DirectoryInfo Directory = TargetObject as DirectoryInfo;
-                string PathName = Path.Combine(Directory.FullName, 
+                string PathName = Path.Combine(Directory.FullName,
                     Context.Request.Path.Substring(BasePathName.Length).Trim('/').Trim());
 
                 if (File.Exists(PathName))
@@ -298,7 +316,6 @@ namespace Aegis.Endpoints.HTTP
                 }
             }
 
-            // Handler routing.
             return Context;
         }
 
@@ -311,30 +328,30 @@ namespace Aegis.Endpoints.HTTP
         {
             switch (File.Extension.ToLower())
             {
-                case "jpg":
-                case "jpeg":
-                case "png":
-                case "gif":
+                case ".jpg":
+                case ".jpeg":
+                case ".png":
+                case ".gif":
                     SetContentAsFile(Context, File, "image");
                     break;
 
-                case "css":
-                case "js":
+                case ".css":
+                case ".js":
                     SetContentAsFile(Context, File, "text");
                     break;
 
-                case "json":
-                case "xml":
+                case ".json":
+                case ".xml":
                     SetContentAsFile(Context, File, "application");
                     break;
 
-                case "txt":
-                case "log":
+                case ".txt":
+                case ".log":
                     SetContentAsFile(Context, File, "text", "plain");
                     break;
 
-                case "html":
-                case "htm":
+                case ".html":
+                case ".htm":
                     SetContentAsFile(Context, File, "text", "html");
                     break;
 

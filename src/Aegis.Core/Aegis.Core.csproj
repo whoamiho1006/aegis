@@ -16,8 +16,4 @@
     <PackageReference Include="Secp256k1.Net" Version="0.1.55" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Endpoints\IPC\" />
-  </ItemGroup>
-
 </Project>

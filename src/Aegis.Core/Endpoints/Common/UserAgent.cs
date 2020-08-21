@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Aegis.Endpoints.Common
 {
-    [Header("Content-Type")]
+    [Header("User-Agent")]
     public class UserAgent : Header<UserAgent>
     {
         /// <summary>

@@ -8,6 +8,18 @@ namespace Aegis.Endpoints.Common
 {
     public class HeaderCollection : List<IHeader>
     {
+
+        /// <summary>
+        /// Register basic header-types.
+        /// </summary>
+        static HeaderCollection()
+        {
+            Header.Register<UserAgent>();
+            Header.Register<ContentType>();
+            Header.Register<XRequestWith>();
+            Header.Register<Authorization>();
+        }
+
         /// <summary>
         /// Find a header instance by Name.
         /// </summary>
@@ -113,5 +125,6 @@ namespace Aegis.Endpoints.Common
                 catch { }
             }
         }
+
     }
 }

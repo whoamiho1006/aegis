@@ -64,8 +64,9 @@ namespace Aegis.Endpoints.Common
     /// </summary>
     public sealed class Header
     {
-        private static ConcurrentDictionary<HeaderAttribute, 
-            (Func<object> Ctor, Action<object> Dtor)> m_HeaderTypes;
+        private static ConcurrentDictionary<HeaderAttribute,
+            (Func<object> Ctor, Action<object> Dtor)> m_HeaderTypes
+            = new ConcurrentDictionary<HeaderAttribute, (Func<object> Ctor, Action<object> Dtor)>();
 
         /// <summary>
         /// Register a header type.
@@ -83,10 +84,11 @@ namespace Aegis.Endpoints.Common
                 if (Attribute is null)
                     throw new NotSupportedException(nameof(HeaderType));
 
-                if (!m_HeaderTypes.TryAdd(Attribute, (
+                //if (!) throw new DuplicateNameException(nameof(HeaderType));
+                m_HeaderTypes.TryAdd(Attribute, (
                     () => ObjectPool<HeaderType>.Alloc(),
                     (X) => ObjectPool<HeaderType>.Free(X as HeaderType)
-                ))) throw new DuplicateNameException(nameof(HeaderType));
+                ));
             }
         }
 
@@ -96,17 +98,10 @@ namespace Aegis.Endpoints.Common
         /// <returns></returns>
         internal static IHeader Instantiate(ref string Header)
         {
-            (Func<object> Ctor, Action<object> Dtor) Tuple;
-
-            foreach (HeaderAttribute Each in m_HeaderTypes.Keys)
+            foreach (var Each in m_HeaderTypes.ToArray())
             {
-                if (Header.StartsWith(Each.Name))
-                {
-                    if (!m_HeaderTypes.TryGetValue(Each, out Tuple))
-                        return null;
-
-                    return Tuple.Ctor() as IHeader;
-                }
+                if (Header.StartsWith(Each.Key.Name))
+                    return Each.Value.Ctor() as IHeader;
             }
 
             return null;
@@ -132,5 +127,6 @@ namespace Aegis.Endpoints.Common
                 }
             }
         }
+
     }
 }

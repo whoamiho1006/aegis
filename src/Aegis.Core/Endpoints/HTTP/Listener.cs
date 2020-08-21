@@ -20,16 +20,16 @@ namespace Aegis.Endpoints.HTTP
         /// <summary>
         /// Initialize a HTTP Listener
         /// </summary>
-        public Listener(params IPEndPoint[] Endpoints)
+        public Listener(params int[] Ports)
         {
             m_Listener = new HttpListener();
             m_Filters = new ConcurrentBag<IFilter<IConnection>>();
             m_Dispatcher = new Dispatcher<HttpListenerContext>();
 
-            foreach (IPEndPoint Endpoint in Endpoints)
+            foreach (int Port in Ports)
             {
                 m_Listener.Prefixes.Add(string
-                    .Join("", "http://", Endpoint, "/"));
+                    .Join("", "http://*:", Port, "/"));
             }
 
             m_Listener.Start();
@@ -110,7 +110,7 @@ namespace Aegis.Endpoints.HTTP
                     if (!(Connection is null))
                         return new Request(Connection);
                 }
-                catch { }
+                catch(Exception e) { }
             }
 
             return null;
