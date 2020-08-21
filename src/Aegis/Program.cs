@@ -1,12 +1,5 @@
-﻿using Aegis.Blockchains.Algorithms;
-using Aegis.Blockchains;
-using System;
-using System.IO;
-using System.Threading;
-using System.Diagnostics;
-using Aegis.Workers.Tasks;
+﻿using Aegis.Endpoints.Handlers;
 using Aegis.Endpoints.HTTP;
-using System.Net;
 
 namespace Aegis
 {
@@ -19,7 +12,8 @@ namespace Aegis
             Kernel Kernel = new Kernel(Engine);
             Listener Listener = new Listener(8088);
 
-            Kernel.Map("/", new DirectoryInfo("Assets"));
+            Kernel.Map("/aegis/generate", new KeyPairGenerator());
+            Kernel.Map("/aegis/authorize", new Authorizer());
 
             Kernel.Use(Listener);
             Engine.Use(Kernel);

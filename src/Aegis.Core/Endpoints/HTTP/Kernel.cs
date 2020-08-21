@@ -195,10 +195,19 @@ namespace Aegis.Endpoints.HTTP
             var Resp = (Context.Request.Connection as Connection)
                                .HLC.Response;
 
+            if (Context.Request.Method == EMethod.OPTIONS)
+                Context.Response.StatusCode = EStatusCode.NoContent;
+
             try { Resp.StatusCode = (int)Context.Response.StatusCode; }
             catch { }
 
             Context.Response.Headers.Export(Resp);
+
+            /* Set-up CORS headers. */
+            Resp.Headers.Add("Access-Control-Allow-Origin", "*");
+            Resp.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+            Resp.Headers.Add("Access-Control-Allow-Headers", "Authorization");
+            Resp.Headers.Add("Access-Control-Max-Age", "60");
 
             if (!(Context.Response.Output.Content is null))
             {
@@ -267,6 +276,7 @@ namespace Aegis.Endpoints.HTTP
                     break;
                 }
             }
+
 
             if (TargetObject is null)
                 return Context;
@@ -388,6 +398,10 @@ namespace Aegis.Endpoints.HTTP
         private Future<Context> Handle(Context Context)
         {
             Future<Context> First = null;
+            
+            if (Context.Request.Method == EMethod.OPTIONS)
+                return Future.MakeCompleted(Context);
+
             Context.Response.StatusCode = EStatusCode.NotFound;
 
             foreach (var Each in m_Middleware)

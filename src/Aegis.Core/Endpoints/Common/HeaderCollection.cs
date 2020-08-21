@@ -36,10 +36,10 @@ namespace Aegis.Endpoints.Common
             return null;
         }
 
-        public IHeader Find<HeaderType>()
-            where HeaderType: IHeader
+        public HeaderType Find<HeaderType>()
+            where HeaderType: class, IHeader
         {
-            return Find(X => X is HeaderType);
+            return Find(X => X is HeaderType) as HeaderType;
         }
 
         /// <summary>
